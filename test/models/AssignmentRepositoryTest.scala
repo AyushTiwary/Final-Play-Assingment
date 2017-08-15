@@ -18,7 +18,7 @@ class AssignmentRepositoryTest extends PlaySpec {
     }
     "delete assignment" in {
       val result = modelsTest.result(modelsTest.repository.deleteAssignment(1))
-      result mustEqual false
+      result mustEqual true
     }
   }
 
