@@ -14,22 +14,21 @@ class RegistrationController @Inject()(userRepository: UserRepository,
                                        forms: UserForms,
                                        val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
-  val hobbiesList: Future[List[String]] =  hobbyRepository.getHobbies
+  val hobbiesList: Future[List[String]] = hobbyRepository.getHobbies
 
   def showRegisterForm(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
 
-   hobbiesList.map {
+    hobbiesList.map {
       case hobbies: List[String] => Ok(views.html.register(forms.registerForm, hobbies))
       case _ => InternalServerError("Could not retrieve hobbies from database")
     }
   }
 
   def handleRegister(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-
     forms.registerForm.bindFromRequest.fold(
       formWithErrors => {
         Logger.info("error occurred" + formWithErrors)
-        hobbiesList.map(hobbies=>BadRequest(views.html.register(formWithErrors, hobbies)))
+        hobbiesList.map(hobbies => BadRequest(views.html.register(formWithErrors, hobbies)))
       },
       userData => {
 
@@ -42,7 +41,7 @@ class RegistrationController @Inject()(userRepository: UserRepository,
 
             userRepository.addUser(user).flatMap {
               case true => userHobbiesRepository.addHobbies(userData.userName, userData.hobbies).map {
-                case Some(x) if x > 0 => Redirect(routes.UserProfileController.getProfileDetails()).withSession("email"->userData.userName)
+                case Some(x) if x > 0 => Redirect(routes.UserProfileController.getProfileDetails()).withSession("email" -> userData.userName)
                 case _ => InternalServerError("failed to add hobbies")
               }
 
@@ -52,5 +51,3 @@ class RegistrationController @Inject()(userRepository: UserRepository,
       })
   }
 }
-
-

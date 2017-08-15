@@ -1,13 +1,11 @@
 package models
 
-
 import com.google.inject.Inject
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 import slick.lifted.ProvenShape
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-
 
 class AssignmentRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends AssignmentTable {
 
@@ -24,7 +22,6 @@ class AssignmentRepository @Inject()(protected val dbConfigProvider: DatabaseCon
   def getAssignments(): Future[List[AssignmentData]] = {
     db.run(assignmentQuery.to[List].result)
   }
-
 }
 
 trait AssignmentTable extends HasDatabaseConfigProvider[JdbcProfile] {
@@ -34,17 +31,14 @@ trait AssignmentTable extends HasDatabaseConfigProvider[JdbcProfile] {
   val assignmentQuery: TableQuery[AssignmentMapping] = TableQuery[AssignmentMapping]
 
   class AssignmentMapping(tag: Tag) extends Table[AssignmentData](tag, "assignmenttable") {
+    override def * : ProvenShape[AssignmentData] = (id, title, description) <> (AssignmentData.tupled,
+      AssignmentData.unapply)
 
     def id: Rep[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
     def title: Rep[String] = column[String]("title")
 
     def description: Rep[String] = column[String]("description")
-
-
-    override def * : ProvenShape[AssignmentData] = (id, title, description) <> (AssignmentData.tupled,
-      AssignmentData.unapply)
   }
 
 }
-

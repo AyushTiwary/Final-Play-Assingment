@@ -8,7 +8,6 @@ import slick.lifted.ProvenShape
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
 @Singleton
 class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends UserTable {
 
@@ -17,11 +16,6 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
   def addUser(user: UserData): Future[Boolean] = {
 
     db.run(userQuery += user.copy(password = BCrypt.hashpw(user.password, BCrypt.gensalt()))).map(_ > 0)
-  }
-
-  def checkUserExists(name: String): Future[Boolean] = {
-    val usersList = db.run(userQuery.filter(_.userName === name).to[List].result)
-    usersList.map(_.nonEmpty)
   }
 
   def matchUserLoginDetails(userName: String, password: String): Future[Boolean] = {
@@ -47,6 +41,11 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     }
   }
 
+  def checkUserExists(name: String): Future[Boolean] = {
+    val usersList = db.run(userQuery.filter(_.userName === name).to[List].result)
+    usersList.map(_.nonEmpty)
+  }
+
   def updateUserDetails(userName: String, updatedData: UserProfileData): Future[Boolean] = {
 
     db.run(userQuery.filter(_.userName === userName).map(user => (user.firstName, user.middleName, user.lastName,
@@ -64,16 +63,16 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     }
   }
 
-  def getAllUsers:Future[List[UserData]] = {
-    db.run(userQuery.filter(_.isAdmin===false).to[List].result)
+  def getAllUsers: Future[List[UserData]] = {
+    db.run(userQuery.filter(_.isAdmin === false).to[List].result)
   }
 
-  def enableOrDisableUser(userName:String, value:Boolean): Future[Boolean] = {
-    db.run(userQuery.filter(_.userName===userName).map(_.isEnabled).update(value)).map(_>0)
+  def enableOrDisableUser(userName: String, value: Boolean): Future[Boolean] = {
+    db.run(userQuery.filter(_.userName === userName).map(_.isEnabled).update(value)).map(_ > 0)
   }
 
-  def isAdmin(userName:String): Future[Boolean] ={
-    db.run(userQuery.filter(_.userName===userName).map(_.isAdmin).to[List].result).map(user => user.head)
+  def isAdmin(userName: String): Future[Boolean] = {
+    db.run(userQuery.filter(_.userName === userName).map(_.isAdmin).to[List].result).map(user => user.head)
   }
 }
 
@@ -85,6 +84,9 @@ trait UserTable extends HasDatabaseConfigProvider[JdbcProfile] {
   val userQuery: TableQuery[UserMapping] = TableQuery[UserMapping]
 
   class UserMapping(tag: Tag) extends Table[UserData](tag, "userdatatable") {
+
+    override def * : ProvenShape[UserData] = (id, firstName, middleName, lastName, userName, password, mobileNo, gender, age, isAdmin, isEnabled) <> (UserData.tupled,
+      UserData.unapply)
 
     def id: Rep[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
@@ -107,9 +109,6 @@ trait UserTable extends HasDatabaseConfigProvider[JdbcProfile] {
     def isAdmin: Rep[Boolean] = column[Boolean]("isadmin")
 
     def isEnabled: Rep[Boolean] = column[Boolean]("isenabled")
-
-    override def * : ProvenShape[UserData] = (id, firstName, middleName, lastName, userName, password, mobileNo, gender, age, isAdmin, isEnabled) <> (UserData.tupled,
-      UserData.unapply)
   }
 
 }

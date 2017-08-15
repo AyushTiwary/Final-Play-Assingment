@@ -15,7 +15,7 @@ case class UserData(id: Int,
 case class AssignmentData(id: Int, title: String,
                           description: String)
 
-case class HobbyData(id:Int,
+case class HobbyData(id: Int,
                      hobby: String)
 
 case class UserHobbyData(userName: String,

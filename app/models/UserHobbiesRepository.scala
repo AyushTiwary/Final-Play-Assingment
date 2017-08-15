@@ -7,12 +7,20 @@ import slick.lifted.ProvenShape
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
-
 @Singleton
 class UserHobbiesRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends UserHobbyTable {
 
   import driver.api._
+
+  def getUserHobbies(userName: String): Future[List[String]] = {
+    db.run(userHobbyQuery.filter(_.userName === userName).map(_.hobbyName).to[List].result)
+  }
+
+  def updateHobbies(userName: String, hobbies: List[String]): Future[Option[Int]] = {
+    deleteHobbies(userName).flatMap {
+      case true => addHobbies(userName, hobbies)
+    }
+  }
 
   def addHobbies(userName: String, hobbies: List[String]): Future[Option[Int]] = {
 
@@ -20,18 +28,8 @@ class UserHobbiesRepository @Inject()(protected val dbConfigProvider: DatabaseCo
     db.run(userHobbyQuery ++= list)
   }
 
-  def getUserHobbies(userName: String): Future[List[String]] = {
-    db.run(userHobbyQuery.filter(_.userName === userName).map(_.hobbyName).to[List].result)
-  }
-
   def deleteHobbies(userName: String): Future[Boolean] = {
     db.run(userHobbyQuery.filter(_.userName === userName).delete).map(_ > 0)
-  }
-
-  def updateHobbies(userName: String, hobbies: List[String]): Future[Option[Int]] = {
-    deleteHobbies(userName).flatMap {
-      case true => addHobbies(userName, hobbies)
-    }
   }
 
 }
@@ -44,14 +42,12 @@ trait UserHobbyTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
   class UserHobbyMapping(tag: Tag) extends Table[UserHobbyData](tag, "userhobbytable") {
 
+    override def * : ProvenShape[UserHobbyData] = (userName, hobbyName) <> (UserHobbyData.tupled,
+      UserHobbyData.unapply)
+
     def userName: Rep[String] = column[String]("username")
 
     def hobbyName: Rep[String] = column[String]("hobbyname")
-
-    override def * : ProvenShape[UserHobbyData] = (userName, hobbyName) <> (UserHobbyData.tupled,
-      UserHobbyData.unapply)
   }
 
 }
-
-

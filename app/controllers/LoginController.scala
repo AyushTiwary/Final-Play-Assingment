@@ -6,7 +6,6 @@ import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.concurrent.Future
 
 class LoginController @Inject()(userRepository: UserRepository, forms: UserForms, implicit val messagesApi: MessagesApi)
@@ -27,7 +26,6 @@ class LoginController @Inject()(userRepository: UserRepository, forms: UserForms
         Future.successful(BadRequest(views.html.login(formWithErrors)))
       },
       userData => {
-
         for {bool1 <- userRepository.matchUserLoginDetails(userData.username.trim, userData.password.trim)
              bool2 <- userRepository.isUserEnabled(userData.username.trim)
         } yield {

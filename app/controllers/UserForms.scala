@@ -5,7 +5,6 @@ import play.api.data._
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import scala.util.matching.Regex
 
-
 class UserForms {
 
   val registerForm = Form(mapping(

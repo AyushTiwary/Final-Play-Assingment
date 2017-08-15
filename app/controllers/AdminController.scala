@@ -8,7 +8,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.mvc.{Action, AnyContent, Controller, Request}
 import models.{AssignmentData, AssignmentRepository, UserData, UserRepository}
 
-
 class AdminController @Inject()(userRepository: UserRepository,
                                 assignmentRepository: AssignmentRepository,
                                 forms: UserForms,
