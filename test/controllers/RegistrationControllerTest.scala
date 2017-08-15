@@ -51,21 +51,6 @@ class RegistrationControllerTest extends PlaySpec with MockitoSugar with GuiceOn
       redirectLocation(result) mustBe Some("/getDetails")
     }
 
-    "fail to save user details" in {
-      when(userRepository.checkUserExists("ayush.tiwari@knoldus.in")).thenReturn(Future.successful(false))
-      val mobileNo = 9560790485L
-      val age = 20
-      val user: UserData = UserData(0, "ayush", None, "tiwari", "ayush.tiwari@knoldus.in",
-        "knoldus2017", mobileNo, "male", age)
-      when(userRepository.addUser(user)).thenReturn(Future.successful(false))
-
-      val result: Future[Result] = registrationController.handleRegister().apply(FakeRequest("GET", "/handleregister").withFormUrlEncodedBody(
-        "name" -> "ayush", "middleName" -> "", "lastName" -> "tiwari", "userName" -> "ayush.tiwari@knoldus.in", "password" -> "knoldus",
-        "re_enterPassword" -> "knoldus2017", "mobileNo" -> "9560790485", "gender" -> "male", "age" -> "20",
-        "hobbies[0]" -> "chess"))
-
-      status(result) mustBe 500
-    }
 
     "handle the case where username already exists" in {
       when(userRepository.checkUserExists("ayush.tiwari@knoldus.in")).thenReturn(Future.successful(true))
