@@ -1,0 +1,17 @@
+@main("Welcome to Knoldus") {
+<h1 align="center">Welcome to Knoldus!</h1>
+<h6 align="center">Scala | Spark | Akka | Play</h6>
+}
+
+<button type="button" class="login-or-signUp" onclick="signUp()">SignUp</button>
+<button type="button" class="login-or-signUp" onclick="login()">Login</button>
+
+    <script>
+        function signUp() {
+            window.location="@routes.RegistrationController.showRegisterForm()";
+        }
+
+        function login() {
+            window.location="@routes.LoginController.showLoginForm()";
+        }
+    </script>
