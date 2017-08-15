@@ -22,7 +22,6 @@ class HobbiesRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
 
 }
 
-
 trait HobbyRepositoryTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import driver.api._
