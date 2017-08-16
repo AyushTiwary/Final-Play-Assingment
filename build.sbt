@@ -21,6 +21,8 @@ libraryDependencies ++= Seq(
   evolutions
 )
 
+coverageExcludedPackages := """controllers\..*Reverse.*;router.Routes.*;"""
+
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"
 
